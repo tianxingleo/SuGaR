@@ -48,7 +48,7 @@ def refined_training(args):
     
         
     # -----Rendering parameters-----
-    compute_color_in_rasterizer = False  # TODO: Try True
+    compute_color_in_rasterizer = True  # TODO: Try True
 
         
     # -----Optimization parameters-----
@@ -222,9 +222,10 @@ def refined_training(args):
         
 
     # -----Log and save-----
-    print_loss_every_n_iterations = 50
+    print_loss_every_n_iterations = 200
     save_model_every_n_iterations = 1_000_000 # 500, 1_000_000  # TODO
-    save_milestones = [2000, 7_000, 15_000]
+    # save_milestones = [2000, 7_000, 15_000]
+    save_milestones = []
 
     # ====================End of parameters====================
 
@@ -235,10 +236,10 @@ def refined_training(args):
             args.output_dir = os.path.join("./output/refined", args.scene_path.split("/")[-2])
             
     # Bounding box
-    if args.bboxmin is None:
+    if (args.bboxmin is None) or (args.bboxmin == 'None'):
         use_custom_bbox = False
     else:
-        if args.bboxmax is None:
+        if (args.bboxmax is None) or (args.bboxmax == 'None'):
             raise ValueError("You need to specify both bboxmin and bboxmax.")
         use_custom_bbox = True
         
@@ -396,7 +397,7 @@ def refined_training(args):
     if use_white_background:
         bg_tensor = torch.ones(3, dtype=torch.float, device=nerfmodel.device)
     else:
-        bg_tensor = None
+        bg_tensor = torch.zeros(3, dtype=torch.float, device=nerfmodel.device)
     
     # ====================Initialize SuGaR model====================
     # Construct SuGaR model

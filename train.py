@@ -2,6 +2,7 @@ import argparse
 from sugar_utils.general_utils import str2bool
 from sugar_trainers.coarse_density import coarse_training_with_density_regularization
 from sugar_trainers.coarse_sdf import coarse_training_with_sdf_regularization
+from sugar_trainers.coarse_density_and_dn_consistency import coarse_training_with_density_regularization_and_dn_consistency
 from sugar_extractors.coarse_mesh import extract_mesh_from_coarse_sugar
 from sugar_trainers.refine import refined_training
 from sugar_extractors.refined_mesh import extract_mesh_and_texture_from_refined_sugar
@@ -30,15 +31,16 @@ if __name__ == "__main__":
     
     # Regularization for coarse SuGaR
     parser.add_argument('-r', '--regularization_type', type=str,
-                        help='(Required) Type of regularization to use for coarse SuGaR. Can be "sdf" or "density". ' 
-                        'For reconstructing detailed objects centered in the scene with 360° coverage, "density" provides a better foreground mesh. '
-                        'For a stronger regularization and a better balance between foreground and background, choose "sdf".')
+                        help='(Required) Type of regularization to use for coarse SuGaR. Can be "sdf", "density" or "dn_consistency". ' 
+                        'We recommend using "dn_consistency" for the best mesh quality.')
     
     # Extract mesh
     parser.add_argument('-l', '--surface_level', type=float, default=0.3, 
                         help='Surface level to extract the mesh at. Default is 0.3')
     parser.add_argument('-v', '--n_vertices_in_mesh', type=int, default=1_000_000, 
                         help='Number of vertices in the extracted mesh.')
+    parser.add_argument('--project_mesh_on_surface_points', type=str2bool, default=True, 
+                        help='If True, project the mesh on the surface points for better details.')
     parser.add_argument('-b', '--bboxmin', type=str, default=None, 
                         help='Min coordinates to use for foreground.')  
     parser.add_argument('-B', '--bboxmax', type=str, default=None, 
@@ -57,7 +59,7 @@ if __name__ == "__main__":
                         help='If True, will export a textured mesh as an .obj file from the refined SuGaR model. '
                         'Computing a traditional colored UV texture should take less than 10 minutes.')
     parser.add_argument('--square_size',
-                        default=10, type=int, help='Size of the square to use for the UV texture.')
+                        default=8, type=int, help='Size of the square to use for the UV texture.')
     parser.add_argument('--postprocess_mesh', type=str2bool, default=False, 
                         help='If True, postprocess the mesh by removing border triangles with low-density. '
                         'This step takes a few minutes and is not needed in general, as it can also be risky. '
@@ -127,6 +129,8 @@ if __name__ == "__main__":
         coarse_sugar_path = coarse_training_with_sdf_regularization(coarse_args)
     elif args.regularization_type == 'density':
         coarse_sugar_path = coarse_training_with_density_regularization(coarse_args)
+    elif args.regularization_type == 'dn_consistency':
+        coarse_sugar_path = coarse_training_with_density_regularization_and_dn_consistency(coarse_args)
     else:
         raise ValueError(f'Unknown regularization type: {args.regularization_type}')
     
@@ -139,6 +143,7 @@ if __name__ == "__main__":
         'coarse_model_path': coarse_sugar_path,
         'surface_level': args.surface_level,
         'decimation_target': args.n_vertices_in_mesh,
+        'project_mesh_on_surface_points': args.project_mesh_on_surface_points,
         'mesh_output_dir': None,
         'bboxmin': args.bboxmin,
         'bboxmax': args.bboxmax,

@@ -4,10 +4,17 @@ import os
 import torch
 import plotly.graph_objs as go
 from gaussian_splatting.scene.gaussian_model import GaussianModel
-from gaussian_splatting.gaussian_renderer import render as gs_render
 from gaussian_splatting.scene.dataset_readers import fetchPly
 from sugar_utils.spherical_harmonics import SH2RGB
 from .cameras import CamerasWrapper, load_gs_cameras
+
+use_gsplat_rasterizer = False
+if use_gsplat_rasterizer:
+    print("Using gsplat rasterizer from Nerfstudio.")
+    from gsplat_wrapper.gaussian_renderer import render as gs_render
+else:
+    print("Using original 3DGS rasterizer from Inria.")
+    from gaussian_splatting.gaussian_renderer import render as gs_render
 
 
 class ModelParams(): 

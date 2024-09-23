@@ -48,7 +48,7 @@ def coarse_training_with_sdf_regularization(args):
     
         
     # -----Rendering parameters-----
-    compute_color_in_rasterizer = False  # TODO: Try True
+    compute_color_in_rasterizer = True  # TODO: Try True
 
         
     # -----Optimization parameters-----
@@ -218,7 +218,7 @@ def coarse_training_with_sdf_regularization(args):
         
 
     # -----Log and save-----
-    print_loss_every_n_iterations = 50
+    print_loss_every_n_iterations = 200
     save_model_every_n_iterations = 1_000_000
     # save_milestones = [9000, 12_000, 15_000]
     save_milestones = [15_000]
@@ -559,7 +559,7 @@ def coarse_training_with_sdf_regularization(args):
                         if (iteration >= start_reset_neighbors_from) and ((iteration == regularize_from + 1) or (iteration % reset_neighbors_every == 0)):
                             CONSOLE.print("\n---INFO---\nResetting neighbors...")
                             sugar.reset_neighbors()
-                        neighbor_idx = sugar.get_neighbors_of_random_points(num_samples=regularity_samples,)
+                        neighbor_idx = sugar.get_neighbors_of_random_points(num_samples=regularity_samples,)  # TODO: REMOVE THIS PART
                         if visibility_filter is not None:
                             neighbor_idx = neighbor_idx[visibility_filter]  # TODO: Error here
 
