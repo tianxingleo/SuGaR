@@ -49,7 +49,7 @@ if __name__ == "__main__":
                         help='Number of refinement iterations.')
     
     # (Optional) Parameters for textured mesh extraction
-    parser.add_argument('-t', '--export_uv_textured_mesh', type=str2bool, default=True, 
+    parser.add_argument('-t', '--export_obj', type=str2bool, default=True, 
                         help='If True, will export a textured mesh as an .obj file from the refined SuGaR model. '
                         'Computing a traditional colored UV texture should take less than 10 minutes.')
     parser.add_argument('--square_size',
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     if args.refinement_time == 'long':
         args.refinement_iterations = 15_000
         print('Using long refinement time.')
-    if args.export_uv_textured_mesh:
+    if args.export_obj:
         print('Will export a UV-textured mesh as an .obj file.')
     if args.export_ply:
         print('Will export a ply file with the refined 3D Gaussians at the end of the training.')
@@ -146,7 +146,7 @@ if __name__ == "__main__":
             --bboxmin {args.bboxmin} \
             --bboxmax {args.bboxmax} \
             --center_bbox {args.center_bbox} \
-            -t {args.export_uv_textured_mesh} \
+            -t {args.export_obj} \
             --square_size {args.square_size} \
             --postprocess_mesh {args.postprocess_mesh} \
             --postprocess_density_threshold {args.postprocess_density_threshold} \
