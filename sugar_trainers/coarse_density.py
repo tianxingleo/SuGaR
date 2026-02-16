@@ -54,7 +54,8 @@ def coarse_training_with_density_regularization(args):
     # -----Optimization parameters-----
 
     # Learning rates and scheduling
-    num_iterations = 15_000  # Changed
+    # 支持通过 args.num_iterations 传递，如果没有则使用默认值
+    num_iterations = getattr(args, 'num_iterations', 15_000)
 
     spatial_lr_scale = None
     position_lr_init=0.00016
@@ -113,7 +114,8 @@ def coarse_training_with_density_regularization(args):
     if regularize_sdf:
         beta_mode = 'average'  # 'learnable', 'average' or 'weighted_average'
         
-        start_sdf_regularization_from = 9000
+        # 动态设置 SDF 正则化起始点（总迭代次数的 60%）
+        start_sdf_regularization_from = int(num_iterations * 0.6)
         regularize_sdf_only_for_gaussians_with_high_opacity = False
         if regularize_sdf_only_for_gaussians_with_high_opacity:
             sdf_regularization_opacity_threshold = 0.5
@@ -130,7 +132,8 @@ def coarse_training_with_density_regularization(args):
             
             normalize_by_sdf_std = False  # False
             
-            start_sdf_estimation_from = 9000  # 7000
+            # SDF 估计起始点（与正则化起始点相同）
+            start_sdf_estimation_from = int(num_iterations * 0.6)  # 9000 for 15000 iterations
             
             sample_only_in_gaussians_close_to_surface = True
             close_gaussian_threshold = 2.  # 2.
